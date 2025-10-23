@@ -1,0 +1,16 @@
+@import 'tailwindcss';
+
+:root {
+    --bgLight: #f6f7f8;
+    --bgDark: #101922;
+    --primary: #137fec;
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+
+.form-input {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
