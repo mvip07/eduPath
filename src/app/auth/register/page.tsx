@@ -1,63 +1,41 @@
-import AuthNavbar from '@/components/AuthNavbar'
+'use client'
+import { useRouter } from 'next/navigation'
+import { useRegister } from '@/hooks/useRegister'
 
 export default function Register() {
+    const router = useRouter()
+    const { formData, handleChange, handleSubmit } = useRegister()
+
     return (
         <div className="bg-[var(--bgLight)] dark:bg-[var(--bgDark)] font-display text-slate-800 dark:text-slate-200">
             <div className="flex flex-col min-h-screen">
-                <AuthNavbar />
                 <main className="flex-grow flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
                     <div className="w-full max-w-md space-y-8 bg-white dark:bg-[var(--bgDark)] rounded-xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-none dark:border dark:border-slate-800">
                         <div>
-                            <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Welcome back</h2>
-                            <p className="mt-2 text-center text-sm text-slate-600 dark:text-slate-400">Sign in to continue to your dashboard.</p>
+                            <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Create User</h2>
                         </div>
-                        <form action="#" className="mt-8 space-y-6" method="POST">
-                            <input name="remember" type="hidden" value="true" />
+                        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
                             <div className="rounded-lg space-y-4">
-                                <div>
-                                    <label className="sr-only" htmlFor="firstname">
-                                        First Name
-                                    </label>
-                                    <input autoComplete="firstname" className="form-input relative block w-full px-3 py-3 border border-slate-300 dark:border-slate-700 bg-[var(--bgLight)] dark:bg-slate-800 placeholder-slate-500 text-slate-900 dark:text-slate-50 rounded-lg focus:outline-none focus:ring-[var(--primary)] focus:border-[var(--primary)] focus:z-10 sm:text-sm" id="firstname" name="firstname" placeholder="Enter your First Name" required type="text" />
-                                </div>
-                                <div>
-                                    <label className="sr-only" htmlFor="lastname">
-                                        Email address
-                                    </label>
-                                    <input autoComplete="lastname" className="form-input relative block w-full px-3 py-3 border border-slate-300 dark:border-slate-700 bg-[var(--bgLight)] dark:bg-slate-800 placeholder-slate-500 text-slate-900 dark:text-slate-50 rounded-lg focus:outline-none focus:ring-[var(--primary)] focus:border-[var(--primary)] focus:z-10 sm:text-sm" id="lastname" name="lastname" placeholder="Enter your Last Name" required type="text" />
-                                </div>
-                                <div>
-                                    <label className="sr-only" htmlFor="email-address">
-                                        Email address
-                                    </label>
-                                    <input autoComplete="email" className="form-input relative block w-full px-3 py-3 border border-slate-300 dark:border-slate-700 bg-[var(--bgLight)] dark:bg-slate-800 placeholder-slate-500 text-slate-900 dark:text-slate-50 rounded-lg focus:outline-none focus:ring-[var(--primary)] focus:border-[var(--primary)] focus:z-10 sm:text-sm" id="email-address" name="email" placeholder="Enter your email" required type="email" />
-                                </div>
-                                <div>
-                                    <label className="sr-only" htmlFor="password">
-                                        Password
-                                    </label>
-                                    <input autoComplete="current-password" className="form-input relative block w-full px-3 py-3 border border-slate-300 dark:border-slate-700 bg-[var(--bgLight)] dark:bg-slate-800 placeholder-slate-500 text-slate-900 dark:text-slate-50 rounded-lg focus:outline-none focus:ring-[var(--primary)] focus:border-[var(--primary)] focus:z-10 sm:text-sm" id="password" name="password" placeholder="Enter your password" required type="password" />
-                                </div>
+                                <input name="active_term" placeholder="Full Name" value={formData?.active_term} onChange={handleChange} required type="text" className="form-input relative block w-full px-3 py-3 border border-slate-300 dark:border-slate-700 bg-[var(--bgLight)] dark:bg-slate-800 rounded-lg focus:outline-none" />
+                                <input name="full_name" placeholder="Full Name" value={formData?.full_name} onChange={handleChange} required type="text" className="form-input relative block w-full px-3 py-3 border border-slate-300 dark:border-slate-700 bg-[var(--bgLight)] dark:bg-slate-800 rounded-lg focus:outline-none" />
+                                <input name="username" placeholder="Username" value={formData?.username} onChange={handleChange} required type="text" className="form-input relative block w-full px-3 py-3 border border-slate-300 dark:border-slate-700 bg-[var(--bgLight)] dark:bg-slate-800 rounded-lg focus:outline-none" />
+                                <input name="phone_number" placeholder="Phone Number (+998...)" value={formData?.phone_number} onChange={handleChange} required type="text" className="form-input relative block w-full px-3 py-3 border border-slate-300 dark:border-slate-700 bg-[var(--bgLight)] dark:bg-slate-800 rounded-lg focus:outline-none" />
+                                <input name="password" placeholder="Password" value={formData?.password} onChange={handleChange} required type="password" className="form-input relative block w-full px-3 py-3 border border-slate-300 dark:border-slate-700 bg-[var(--bgLight)] dark:bg-slate-800 rounded-lg focus:outline-none" />
+                                <select value={formData?.role} onChange={handleChange} required className="form-input relative block w-full px-3 py-3 border border-slate-300 dark:border-slate-700 bg-[var(--bgLight)] dark:bg-slate-800 rounded-lg focus:outline-none">
+                                    <option value="STUDENT">STUDENT</option>
+                                    <option value="ADMIN">ADMIN</option>
+                                </select>
                             </div>
-                            <div className="flex items-center justify-between">
-                                <div className="text-sm">
-                                    <a className="font-medium text-[var(--primary)] hover:text-opacity-80" href="#">
-                                        Forgot your password?
-                                    </a>
-                                </div>
-                            </div>
-                            <div>
-                                <button className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-[var(--primary)] hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary)]" type="submit">
+
+                            <div className="flex gap-4 items-center justify-center">
+                                <button onClick={() => router.back()} type="submit" className="group relative text-nowrap flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-[var(--primary)] hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary)]">
+                                    Go Back
+                                </button>
+                                <button type="submit" className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-[var(--primary)] hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary)]">
                                     Sign Up
                                 </button>
                             </div>
                         </form>
-                        <p className="mt-6 text-center text-sm text-slate-600 dark:text-slate-400">
-                            Dont have an account?
-                            <a className="font-medium text-[var(--primary)] hover:text-opacity-80" href="/auth/login">
-                                Sign in
-                            </a>
-                        </p>
                     </div>
                 </main>
             </div>
