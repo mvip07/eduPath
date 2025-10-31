@@ -1,50 +1,201 @@
 'use client'
-import { useCourses } from '@/hooks/useCourses'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { useCourses } from '@/hooks/useCourses'
+import { motion, AnimatePresence } from 'framer-motion'
+import { BookOpen, Clock, Play, TrendingUp, Search, Grid, List, Award, Bookmark, Share2 } from 'lucide-react'
 
 export default function StudentDashboard() {
     const router = useRouter()
-    const { courses, fetchCourses, loading } = useCourses()
+    const { courses, loading, fetchCourses } = useCourses()
+    const [searchTerm, setSearchTerm] = useState('')
+    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+    const [selectedCategory, setSelectedCategory] = useState('all')
 
     useEffect(() => {
         fetchCourses()
     }, [fetchCourses])
 
+    const categories = ['all', 'programming', 'design', 'business', 'marketing', 'science']
+    const stats = {
+        enrolled: 12,
+        completed: 3,
+        inProgress: 5,
+        hoursSpent: 48,
+    }
+
+    const filteredCourses = courses?.filter((course) => course.title.toLowerCase().includes(searchTerm.toLowerCase()) && (selectedCategory === 'all' || course.level === selectedCategory))
+
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1,
+            },
+        },
+    }
+
+    const itemVariants = {
+        hidden: { y: 20, opacity: 0 },
+        visible: {
+            y: 0,
+            opacity: 1,
+            transition: {
+                duration: 0.5,
+            },
+        },
+    }
+
     return (
-        <main className="flex-1 p-8 overflow-y-auto">
-            <header className="mb-8">
-                <h1 className="text-4xl font-bold text-black dark:text-white">My Learning</h1>
-            </header>
-            <div className="space-y-12">
-                {loading ? (
-                    <div className="flex items-center justify-center h-64">
-                        <div className="w-10 h-10 border-4 border-[var(--primary)] border-t-transparent rounded-full animate-spin"></div>
-                        <p className="ml-3 text-gray-600 dark:text-gray-300">Yuklanmoqda...</p>
+        <div className="max-w-7xl mx-auto space-y-8">
+            <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+                <div>
+                    <h1 className="text-4xl font-bold text-gray-900 mb-2">My Learning Dashboard</h1>
+                    <p className="text-gray-600 text-lg">Continue your learning journey and discover new courses</p>
+                </div>
+
+                <div className="flex items-center gap-4">
+                    <div className="flex bg-white rounded-xl p-1 shadow-lg border border-gray-200">
+                        <button onClick={() => setViewMode('grid')} className={`p-2 rounded-lg transition-all duration-300 ${viewMode === 'grid' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:text-blue-600'}`}>
+                            <Grid className="w-5 h-5" />
+                        </button>
+                        <button onClick={() => setViewMode('list')} className={`p-2 rounded-lg transition-all duration-300 ${viewMode === 'list' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 hover:text-blue-600'}`}>
+                            <List className="w-5 h-5" />
+                        </button>
                     </div>
-                ) : courses && courses.length === 0 ? (
-                    <div className="text-center text-gray-600 dark:text-gray-400 mt-16">Kurslar topilmadi.</div>
-                ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {courses.map((i) => (
-                            <div key={i.id} onClick={() => router.push('/lesson/1')} className="bg-[var(--bgLight)] dark:bg-[var(--bgDark)] shadow-md rounded-lg overflow-hidden group cursor-pointer">
-                                <div className="relative">
-                                    <div className="w-full bg-center bg-no-repeat aspect-video bg-cover" style={{ backgroundImage: `url(${i.image_url})` }}></div>
-                                    <div className="absolute bottom-2 left-2 right-2 p-2 bg-black/50 rounded">
-                                        <div className="w-full bg-[var(--primary)]/30 rounded-full h-1.5">
-                                            <div className="bg-[var(--primary)] h-1.5 rounded-full" style={{ width: '75%' }}></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="p-4">
-                                    <h3 className="text-base font-semibold text-black dark:text-white">{i.title}</h3>
-                                    <p className="text-sm text-black/60 dark:text-white/60">{i.description}</p>
-                                </div>
-                            </div>
+                </div>
+            </motion.div>
+
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-500 group">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-gray-600 text-sm font-medium">Enrolled Courses</p>
+                            <p className="text-3xl font-bold text-gray-900 mt-2">{stats.enrolled}</p>
+                        </div>
+                        <div className="p-3 bg-blue-100 rounded-xl group-hover:bg-blue-200 transition-colors">
+                            <BookOpen className="w-6 h-6 text-blue-600" />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-500 group">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-gray-600 text-sm font-medium">Completed</p>
+                            <p className="text-3xl font-bold text-gray-900 mt-2">{stats.completed}</p>
+                        </div>
+                        <div className="p-3 bg-green-100 rounded-xl group-hover:bg-green-200 transition-colors">
+                            <Award className="w-6 h-6 text-green-600" />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-500 group">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-gray-600 text-sm font-medium">In Progress</p>
+                            <p className="text-3xl font-bold text-gray-900 mt-2">{stats.inProgress}</p>
+                        </div>
+                        <div className="p-3 bg-yellow-100 rounded-xl group-hover:bg-yellow-200 transition-colors">
+                            <TrendingUp className="w-6 h-6 text-yellow-600" />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-500 group">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-gray-600 text-sm font-medium">Hours Spent</p>
+                            <p className="text-3xl font-bold text-gray-900 mt-2">{stats.hoursSpent}h</p>
+                        </div>
+                        <div className="p-3 bg-purple-100 rounded-xl group-hover:bg-purple-200 transition-colors">
+                            <Clock className="w-6 h-6 text-purple-600" />
+                        </div>
+                    </div>
+                </div>
+            </motion.div>
+
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+                <div className="flex flex-col sm:flex-row gap-4 flex-1 w-full">
+                    <div className="relative flex-1 max-w-md">
+                        <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                        <input type="text" placeholder="Search courses..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-3 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 shadow-sm" />
+                    </div>
+
+                    <div className="flex items-center gap-2 overflow-x-auto pb-2">
+                        {categories.map((category) => (
+                            <button key={category} onClick={() => setSelectedCategory(category)} className={`px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-all duration-300 ${selectedCategory === category ? 'bg-blue-600 text-white shadow-md' : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'}`}>
+                                {category.charAt(0).toUpperCase() + category.slice(1)}
+                            </button>
                         ))}
                     </div>
-                )}
-            </div>
-        </main>
+                </div>
+            </motion.div>
+
+            {loading ? (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center justify-center h-64 bg-white rounded-2xl shadow-lg">
+                    <div className="text-center">
+                        <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                        <p className="text-gray-600">Loading your courses...</p>
+                    </div>
+                </motion.div>
+            ) : filteredCourses && filteredCourses.length === 0 ? (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16 bg-white rounded-2xl shadow-lg">
+                    <BookOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No courses found</h3>
+                    <p className="text-gray-600">Try adjusting your search or explore new courses</p>
+                </motion.div>
+            ) : (
+                <motion.div variants={containerVariants} animate="visible" className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6' : 'space-y-4'}>
+                    <AnimatePresence>
+                        {filteredCourses?.map((course) => (
+                            <motion.div key={course.id} variants={itemVariants} layout whileHover={{ y: -5, scale: 1.02 }} className={`group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 overflow-hidden cursor-pointer ${viewMode === 'list' ? 'flex' : ''}`} onClick={() => router.push(`/student/lesson/${course.id}`)}>
+                                <div className={`relative overflow-hidden ${viewMode === 'list' ? 'w-48 flex-shrink-0' : 'h-48'}`}>
+                                    <div className="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style={{ backgroundImage: `url(${course.image_url})` }} />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                                    <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                        <button className="p-2 bg-white/90 backdrop-blur-sm rounded-lg hover:bg-white transition-colors">
+                                            <Bookmark className="w-4 h-4" />
+                                        </button>
+                                        <button className="p-2 bg-white/90 backdrop-blur-sm rounded-lg hover:bg-white transition-colors">
+                                            <Share2 className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="p-6 flex-1">
+                                    <div className="flex items-start justify-between mb-3">
+                                        <div>
+                                            <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium mb-2">{course.level || 'General'}</span>
+                                            <h3 className="font-bold text-gray-900 text-lg line-clamp-2 group-hover:text-blue-600 transition-colors">{course.title}</h3>
+                                        </div>
+                                    </div>
+
+                                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">{course.description || 'No description available'}</p>
+
+                                    <div className="flex items-center justify-end pt-4 border-t border-gray-100">
+                                        <motion.button
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.95 }}
+                                            className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg flex items-center gap-2 text-sm font-medium"
+                                            onClick={(e) => {
+                                                e.stopPropagation()
+                                                router.push(`/student/lesson/${course.id}`)
+                                            }}
+                                        >
+                                            <Play className="w-4 h-4" />
+                                            Continue
+                                        </motion.button>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </AnimatePresence>
+                </motion.div>
+            )}
+        </div>
     )
 }

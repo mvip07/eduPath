@@ -1,12 +1,12 @@
-import AdminHeader from '@/components/AdminHeader'
+'use client'
+import Layout from '@/components/Layout'
+import { AdminMenu } from '@/utils/menuList'
 
 export default function Rootlayout({ children }: Readonly<{ children: React.ReactNode }>) {
     return (
-        <div className="bg-[var(--bgLight)] dark:[var(--bgDark)] font-display text-slate-800 dark:text-slate-200">
-            <div className="flex min-h-screen">
-                <AdminHeader />
-                {children}
-            </div>
+        <div className="min-h-screen position-relative bg-gradient-to-br from-gray-50 to-gray-100 ">
+            <Layout menuItems={AdminMenu} />
+            <main className="w-full fixed top-20 lg:top-21 left-0 lg:left-80 lg:w-[calc(100%-320px)] h-[calc(100dvh-80px)] lg:h-[calc(100dvh-84px)] overflow-y-auto p-2 sm:p-4 md:p-6">{children}</main>
         </div>
     )
 }

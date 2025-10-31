@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { FormEvent, useCallback, useEffect, useState } from 'react'
 import { Course, CreateCourse, UpdateCourse } from '@/types'
 import { courseService } from '@/services/courseService'
 import { toast } from 'react-toastify'
@@ -20,9 +20,8 @@ export const useCourses = () => {
         setLoading(true)
         setError(null)
         try {
-            const res = await courseService.list()
-            const data = res.data?.result ?? res.data ?? []
-            setCourses(data)
+            const res = await courseService.getAll()
+            setCourses(res)
         } catch (err: unknown) {
             handleAxiosError(err, 'Courselarni yuklashda xatolik')
         } finally {
@@ -30,19 +29,34 @@ export const useCourses = () => {
         }
     }, [])
 
-    const createCourse = async (payload: CreateCourse) => {
+    const fetchCourse = useCallback(async (id: string): Promise<Course | null> => {
+        setLoading(true)
         try {
-            const res = await courseService.create(payload)
+            const data = await courseService.getById(id)
+            return data
+        } catch (err) {
+            handleAxiosError(err, 'Ma’lumotni yuklab bo‘lmadi!')
+            return null
+        } finally {
+            setLoading(false)
+        }
+    }, [])
+
+    const createCourse = async (e: FormEvent, course: CreateCourse) => {
+        e.preventDefault()
+        if (!course) return
+        setLoading(true)
+        try {
+            await courseService.create(course)
             toast.success('Course yaratildi')
-            await fetchCourses()
-            return res
-        } catch (err: unknown) {
+        } catch (err) {
             handleAxiosError(err, 'Course yaratishda xatolik')
-            throw err
+        } finally {
+            setLoading(false)
         }
     }
 
-    const updateCourse = async (id: string | number, payload: UpdateCourse) => {
+    const updateCourse = async (id: string, payload: UpdateCourse) => {
         try {
             const res = await courseService.update(id, payload)
             toast.success('Course yangilandi')
@@ -50,25 +64,28 @@ export const useCourses = () => {
             return res
         } catch (err: unknown) {
             handleAxiosError(err, 'Yangilashda xatolik')
-            throw err
         }
     }
 
     const deleteCourse = async (id: string | number) => {
         try {
-            await courseService.remove(id)
+            await courseService.delete(id)
             toast.success('Course o‘chirildi')
             await fetchCourses()
         } catch (err: unknown) {
             handleAxiosError(err, 'O‘chirishda xatolik')
-            throw err
         }
     }
+
+    useEffect(() => {
+        fetchCourses()
+    }, [fetchCourses])
 
     return {
         courses,
         loading,
         error,
+        fetchCourse,
         fetchCourses,
         createCourse,
         updateCourse,

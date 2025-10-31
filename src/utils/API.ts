@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { HOST } from './HOST'
+import { clearToken } from './storage'
 
 const containsFiles = (data: unknown): boolean => {
     if (typeof data !== 'object' || data === null) return false
@@ -19,17 +20,19 @@ API.interceptors.request.use(
     (config) => {
         let token: string = ''
 
-        if (typeof window !== 'undefined') {
-            const stored = localStorage.getItem(process.env.NEXT_PUBLIC_EDUPATH_TOKEN!)
+        if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_EDUPATH_TOKEN) {
+            const stored = localStorage.getItem(process.env.NEXT_PUBLIC_EDUPATH_TOKEN)
             token = stored ? JSON.parse(stored)?.access_token || '' : ''
         }
 
         if (token) config.headers.Authorization = `Bearer ${token}`
 
-        if (containsFiles(config.data)) config.headers['Content-Type'] = 'multipart/form-data'
+        if (config.data && containsFiles(config.data)) config.headers['Content-Type'] = 'multipart/form-data'
         else config.headers['Content-Type'] = 'application/json'
 
-        config.headers['Frontend-Path'] = window.location.pathname
+        if (typeof window !== 'undefined') {
+            config.headers['Frontend-Path'] = window.location.pathname
+        }
 
         return config
     },
@@ -38,7 +41,22 @@ API.interceptors.request.use(
 
 API.interceptors.response.use(
     (response) => response,
-    (error) => Promise.reject(error)
+    (error) => {
+        if (error.response && error.response.status === 401) {
+            const currentPath = typeof window !== 'undefined' ? window.location.pathname : ''
+            if (currentPath.startsWith('/auth/login')) {
+                return Promise.reject(error)
+            }
+            clearToken()
+
+            if (typeof window !== 'undefined') {
+                window.location.href = '/auth/login'
+            }
+
+            return Promise.reject(error)
+        }
+        return Promise.reject(error)
+    }
 )
 
 export default API

@@ -1,111 +1,114 @@
+'use client'
+import { useEffect } from 'react'
+import { motion } from 'framer-motion'
+import { useCourses } from '@/hooks/useCourses'
+import { useStudents } from '@/hooks/useStudents'
+import { fadeUp, staggeredList } from '@/components/MotionUtils'
+import { Users, BookOpen, ChevronRight, MoreVertical } from 'lucide-react'
+
 export default function Dashboard() {
+    const { students, loading } = useStudents()
+    const { courses, fetchCourses } = useCourses()
+
+    useEffect(() => {
+        fetchCourses()
+    }, [fetchCourses])
+
     return (
-        <main className="flex-1 p-8">
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-8">Dashboard</h1>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                <div className="bg-white dark:bg-slate-900/40 p-6 rounded-xl border border-slate-200 dark:border-slate-800">
-                    <h2 className="text-base font-medium text-slate-500 dark:text-slate-400 mb-2">Total Students</h2>
-                    <p className="text-3xl font-bold text-slate-900 dark:text-white">1,250</p>
+        <motion.div variants={staggeredList} initial="hidden" animate="visible" className="space-y-8">
+            <motion.div variants={fadeUp} className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-600 to-purple-700 p-8 text-white shadow-2xl">
+                <div className="relative z-10">
+                    <h1 className="text-3xl font-bold mb-2">Welcome back, Admin! 👋</h1>
+                    <p className="text-blue-100 mb-6">Here&apos;s what&apos;s happening with your platform today.</p>
+                    <button className="px-6 py-3 bg-white/20 backdrop-blur-sm rounded-xl hover:bg-white/30 transition-all duration-300 border border-white/30">View Analytics</button>
                 </div>
-                <div className="bg-white dark:bg-slate-900/40 p-6 rounded-xl border border-slate-200 dark:border-slate-800">
-                    <h2 className="text-base font-medium text-slate-500 dark:text-slate-400 mb-2">Active Courses</h2>
-                    <p className="text-3xl font-bold text-slate-900 dark:text-white">35</p>
-                </div>
-                <div className="bg-white dark:bg-slate-900/40 p-6 rounded-xl border border-slate-200 dark:border-slate-800">
-                    <h2 className="text-base font-medium text-slate-500 dark:text-slate-400 mb-2">Support Tickets</h2>
-                    <p className="text-3xl font-bold text-slate-900 dark:text-white">12</p>
-                </div>
+                <div className="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full"></div>
+                <div className="absolute -right-5 -bottom-5 w-20 h-20 bg-white/10 rounded-full"></div>
+            </motion.div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <motion.div variants={fadeUp} className="group relative bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="p-3 rounded-xl bg-blue-50 ">
+                            <Users className="w-6 h-6 text-blue-600 " />
+                        </div>
+                        <MoreVertical className="w-5 h-5 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">{students.length}</h3>
+                    <p className="text-gray-600 mb-2">Total Students</p>
+                </motion.div>
+
+                <motion.div variants={fadeUp} className="group relative bg-white  rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="p-3 rounded-xl bg-green-50">
+                            <BookOpen className="w-6 h-6 text-green-600" />
+                        </div>
+                        <MoreVertical className="w-5 h-5 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900  mb-2">{courses.length}</h3>
+                    <p className="text-gray-600 mb-2">Total Courses</p>
+                </motion.div>
             </div>
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Recent Activity</h2>
-            <div className="bg-white dark:bg-slate-900/40 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
-                <table className="w-full">
-                    <thead>
-                        <tr className="border-b border-slate-200 dark:border-slate-800">
-                            <th className="p-4 text-left text-sm font-semibold text-slate-600 dark:text-slate-300">Student Name</th>
-                            <th className="p-4 text-left text-sm font-semibold text-slate-600 dark:text-slate-300">Course</th>
-                            <th className="p-4 text-left text-sm font-semibold text-slate-600 dark:text-slate-300">Progress</th>
-                            <th className="p-4 text-left text-sm font-semibold text-slate-600 dark:text-slate-300">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr className="border-b border-slate-200 dark:border-slate-800 last:border-b-0">
-                            <td className="p-4 text-slate-800 dark:text-slate-200">Ethan Carter</td>
-                            <td className="p-4 text-slate-500 dark:text-slate-400">Introduction to Programming</td>
-                            <td className="p-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
-                                        <div className="bg-[var(--primary)] h-2 rounded-full progress-bar-inner" style={{ width: '75%' }}></div>
-                                    </div>
-                                    <span className="text-sm font-medium text-slate-800 dark:text-slate-200">75%</span>
-                                </div>
-                            </td>
-                            <td className="p-4">
-                                <span className="px-3 py-1 text-xs font-semibold rounded-full bg-[var(--primary)]/10 dark:bg-[var(--primary)]/20 text-[var(--primary)]">Active</span>
-                            </td>
-                        </tr>
-                        <tr className="border-b border-slate-200 dark:border-slate-800 last:border-b-0">
-                            <td className="p-4 text-slate-800 dark:text-slate-200">Olivia Bennett</td>
-                            <td className="p-4 text-slate-500 dark:text-slate-400">Digital Marketing Fundamentals</td>
-                            <td className="p-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
-                                        <div className="bg-[var(--primary)] h-2 rounded-full progress-bar-inner" style={{ width: '50%' }}></div>
-                                    </div>
-                                    <span className="text-sm font-medium text-slate-800 dark:text-slate-200">50%</span>
-                                </div>
-                            </td>
-                            <td className="p-4">
-                                <span className="px-3 py-1 text-xs font-semibold rounded-full bg-[var(--primary)]/10 dark:bg-[var(--primary)]/20 text-[var(--primary)]">Active</span>
-                            </td>
-                        </tr>
-                        <tr className="border-b border-slate-200 dark:border-slate-800 last:border-b-0">
-                            <td className="p-4 text-slate-800 dark:text-slate-200">Noah Thompson</td>
-                            <td className="p-4 text-slate-500 dark:text-slate-400">Data Science Essentials</td>
-                            <td className="p-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
-                                        <div className="bg-[var(--primary)] h-2 rounded-full progress-bar-inner" style={{ width: '25%' }}></div>
-                                    </div>
-                                    <span className="text-sm font-medium text-slate-800 dark:text-slate-200">25%</span>
-                                </div>
-                            </td>
-                            <td className="p-4">
-                                <span className="px-3 py-1 text-xs font-semibold rounded-full bg-[var(--primary)]/10 dark:bg-[var(--primary)]/20 text-[var(--primary)]">Active</span>
-                            </td>
-                        </tr>
-                        <tr className="border-b border-slate-200 dark:border-slate-800 last:border-b-0">
-                            <td className="p-4 text-slate-800 dark:text-slate-200">Ava Harper</td>
-                            <td className="p-4 text-slate-500 dark:text-slate-400">Graphic Design Basics</td>
-                            <td className="p-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
-                                        <div className="bg-[var(--primary)] h-2 rounded-full progress-bar-inner" style={{ width: '90%' }}></div>
-                                    </div>
-                                    <span className="text-sm font-medium text-slate-800 dark:text-slate-200">90%</span>
-                                </div>
-                            </td>
-                            <td className="p-4">
-                                <span className="px-3 py-1 text-xs font-semibold rounded-full bg-green-500/10 dark:bg-green-500/20 text-green-500">Completed</span>
-                            </td>
-                        </tr>
-                        <tr className="border-b border-slate-200 dark:border-slate-800 last:border-b-0">
-                            <td className="p-4 text-slate-800 dark:text-slate-200">Liam Foster</td>
-                            <td className="p-4 text-slate-500 dark:text-slate-400">Web Development Bootcamp</td>
-                            <td className="p-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
-                                        <div className="bg-[var(--primary)] h-2 rounded-full progress-bar-inner" style={{ width: '10%' }}></div>
-                                    </div>
-                                    <span className="text-sm font-medium text-slate-800 dark:text-slate-200">10%</span>
-                                </div>
-                            </td>
-                            <td className="p-4">
-                                <span className="px-3 py-1 text-xs font-semibold rounded-full bg-[var(--primary)]/10 dark:bg-[var(--primary)]/20 text-[var(--primary)]">Active</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </main>
+
+            {loading ? (
+                <motion.div variants={fadeUp} className="flex items-center justify-center h-64 bg-white rounded-2xl shadow-lg">
+                    <div className="text-center">
+                        <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                        <p className="text-gray-600 ">Loading student data...</p>
+                    </div>
+                </motion.div>
+            ) : students.length === 0 ? (
+                <motion.div variants={fadeUp} className="text-center py-16 bg-white  rounded-2xl shadow-lg">
+                    <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-900  mb-2">No students found</h3>
+                    <p className="text-gray-600 ">Get started by adding your first student</p>
+                </motion.div>
+            ) : (
+                <motion.div variants={fadeUp} className="bg-white  rounded-2xl shadow-lg overflow-hidden border border-gray-100 ">
+                    <div className="px-6 py-4 border-b border-gray-200 ">
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-lg font-semibold text-gray-900 ">Recent Students</h3>
+                            <button className="text-sm text-blue-600 hover:text-blue-700 transition-colors flex items-center">
+                                View All
+                                <ChevronRight className="w-4 h-4 ml-1" />
+                            </button>
+                        </div>
+                    </div>
+                    <div className="overflow-x-auto">
+                        <table className="w-full">
+                            <thead>
+                                <tr className="bg-gray-50 ">
+                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Full Name</th>
+                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
+                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-200">
+                                {students.slice(0, 6).map((student, index) => (
+                                    <motion.tr key={student.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }} className="hover:bg-gray-50  transition-colors group">
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <div className="flex items-center">
+                                                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-semibold mr-3">{student.full_name.charAt(0)}</div>
+                                                <span className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors">{student.full_name}</span>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-gray-600">{student.username}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-gray-600">{student.phone_number}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800  capitalize">{student.role.toLowerCase()}</span>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${student.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>{student.is_active ? 'Active' : 'Inactive'}</span>
+                                        </td>
+                                    </motion.tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </motion.div>
+            )}
+        </motion.div>
     )
 }

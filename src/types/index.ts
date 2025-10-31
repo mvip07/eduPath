@@ -1,19 +1,28 @@
+export type Role = 'STUDENT' | 'ADMIN'
+
 export interface Student {
-    id: number | string
+    id: string
     full_name: string
     username: string
     phone_number: string
-    role: 'STUDENT' | 'ADMIN' | 'TEACHER'
+    role: Role
     is_active: boolean
-    active_term: number
+    active_term?: number
 }
 
-export interface StudentEdit extends Omit<Student, 'id'> {
+export interface StudentEdit {
+    role: Role
+    active_term: 0
+    is_active: true
+    username: string
     password: string
+    full_name: string
+    phone_number: string
 }
 
 export interface CreateStudent extends Omit<StudentEdit, 'is_active' | 'active_term'> {
     active_term: number
+    password: string
 }
 
 export interface Course {
@@ -30,7 +39,7 @@ export interface CreateCourse {
     title: string
     description: string
     level: string
-    image_url?: string
+    image_url: string
 }
 
 export interface UpdateCourse {
@@ -48,6 +57,18 @@ export interface Module {
     description?: string
 }
 
+export interface CreateModule {
+    title: string
+    order: number
+    description: string
+}
+
+export interface UpdateModule {
+    title: string
+    order: number
+    description: string
+}
+
 export interface Lesson {
     id: number | string
     title: string
@@ -58,13 +79,15 @@ export interface Lesson {
 
 export interface ModulePayload {
     title: string
+    order: number
     description: string
 }
 
 export type User = {
     id: string
     username: string
-    role: 'STUDENT' | 'ADMIN' | 'TEACHER'
+    full_name: string
+    role: 'STUDENT' | 'ADMIN'
 }
 
 // export interface AuthContextProps {
@@ -74,7 +97,14 @@ export type User = {
 // }
 
 export interface StoredAuth {
-    access_token: string
+    full_name: string
     id: string | number
+    access_token: string
     role: 'ADMIN' | 'STUDENT'
+}
+
+export interface MenuItem {
+    name: string
+    href: string
+    icon: React.ReactNode
 }

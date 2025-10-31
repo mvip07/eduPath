@@ -1,12 +1,26 @@
 import API from '@/utils/API'
-import { CreateCourse, UpdateCourse } from '@/types'
-
-const base = '/api/course'
+import { Course, CreateCourse, UpdateCourse } from '@/types'
 
 export const courseService = {
-    list: () => API.get(`${base}/`),
-    create: (payload: CreateCourse) => API.post(`${base}/`, payload),
-    remove: (courseId: string | number) => API.delete(`${base}/${courseId}`),
-    getOne: (courseId: string | number) => API.get(`${base}/${courseId}`),
-    update: (courseId: string | number, payload: UpdateCourse) => API.patch(`${base}/${courseId}`, payload),
+    async getAll(): Promise<Course[]> {
+        const res = await API.get('/api/course/')
+        return res.data.result
+    },
+
+    async getById(id: string): Promise<Course> {
+        const res = await API.get(`/api/course/${id}`)
+        return res.data.result
+    },
+
+    async create(data: CreateCourse): Promise<void> {
+        await API.post('/api/course/', data)
+    },
+
+    async update(id: string, data: UpdateCourse): Promise<void> {
+        await API.patch(`/api/course/${id}`, data)
+    },
+
+    async delete(id: string | number): Promise<void> {
+        await API.delete(`/api/course/${id}`)
+    },
 }
