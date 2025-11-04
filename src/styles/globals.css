@@ -1,47 +1,6 @@
-/* @import 'tailwindcss';
-
-:root {
-    --bgLight: #f6f7f8;
-    --bgDark: #101922;
-    --primary: #137fec;
-    --contentLight: #111418;
-    --contentDark: #e1e7ef;
-    --subtleLight: #617589;
-    --subtleDark: #94a3b8;
-    --borderLight: #e2e8f0;
-    --borderDark: #334155;
-    --foregroundLight: #101922;
-    --foregroundDark: #f6f7f8;
-    --mutedLight: #6c757d;
-    --mutedDark: #a0a8b0;
-}
-
-@custom-variant dark (&:where(.dark, .dark *));
-
-.form-input {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-}
-
-.form-radio:checked {
-    background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='3'/%3e%3c/svg%3e");
-    background-color: #137fec;
-    border-color: #137fec;
-} */
-
 @import 'tailwindcss';
 
 :root {
-    --bgLight: #ffffff;
-    --bgDark: #1a1a1a;
-    --textLight: #333333;
-    --textDark: #ffffff;
-    --primary: #4f46e5;
-    --secondary: #6b7280;
-}
-
-:root {
     --bgLight: #f6f7f8;
     --bgDark: #101922;
     --primary: #137fec;
@@ -57,19 +16,6 @@
     --mutedDark: #a0a8b0;
 }
 
-/* body {
-    background-color: var(--bgLight);
-    color: var(--textLight);
+.scroll-none::-webkit-scrollbar {
+    display: none;
 }
-
-html.dark {
-    background-color: var(--bgDark);
-    color: var(--textDark);
-} */
-
-/* @media (prefers-reduced-motion: reduce) {
-    .motion-reduce {
-        animation: none;
-        transition: none;
-    }
-} */

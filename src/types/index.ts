@@ -108,3 +108,14 @@ export interface MenuItem {
     href: string
     icon: React.ReactNode
 }
+
+export interface Type {
+    id: number | string
+    title: string
+    description: string
+}
+
+export interface TypeEdit {
+    title: string
+    description: string
+}
