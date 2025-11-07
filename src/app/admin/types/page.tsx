@@ -1,74 +1,44 @@
 'use client'
-import { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, Edit, Trash2, BookOpen } from 'lucide-react'
-import { EditTypeModal } from './edit/modal'
-import { CreateTypeModal } from './create/modal'
-import { DeleteTypeModal } from './delete/modal'
 import { useTypes } from '@/hooks/useTypes'
-import { fadeUp, staggeredList } from '@/components/MotionUtils'
-
-const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-        opacity: 1,
-        transition: {
-            staggerChildren: 0.1,
-        },
-    },
-}
-
-const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-        y: 0,
-        opacity: 1,
-        transition: {
-            duration: 0.5,
-        },
-    },
-}
+import { containerVariants, fadeUp, itemVariants, staggeredList } from '@/lib/motion'
+import { useModal } from '@/components/UI/Modal'
+import { CreateTypeModal, DeleteTypeModal, EditTypeModal } from './modal'
 
 export default function TypesListPage() {
-    const { loading, types, handleDelete, fetchTypes } = useTypes()
+    const { openModal, closeModal } = useModal()
+    const { loading, fetchType, handleCreate, handleUpdate, handleDelete, types } = useTypes()
 
-    const [selectedTypeId, setSelectedTypeId] = useState<string | null>(null)
-    const [showEditModal, setShowEditModal] = useState(false)
-    const [showDeleteModal, setShowDeleteModal] = useState(false)
+    const handleOpenCreate = () => {
+        openModal({
+            type: 'CREATE',
+            formId: 'typeCreate',
+            title: 'Create Type',
+            btnTitle: 'Create Type',
+            content: <CreateTypeModal closeModal={closeModal} handleCreate={handleCreate} />,
+        })
+    }
 
-    const [showCreateModal, setShowCreateModal] = useState(false)
+    const handleOpenEdit = (id: string) => {
+        openModal({
+            type: 'EDIT',
+            formId: 'typeEdit',
+            title: 'Edit Type',
+            btnTitle: 'Edit Type',
+            content: <EditTypeModal id={id} closeModal={closeModal} fetchType={fetchType} handleUpdate={handleUpdate} />,
+        })
+    }
 
-    const handleCloseEdit = useCallback(() => {
-        setShowEditModal(false)
-        setSelectedTypeId(null)
-        fetchTypes()
-    }, [fetchTypes])
-
-    const handleOpenEdit = useCallback((id: string) => {
-        setSelectedTypeId(id)
-        setShowEditModal(true)
-    }, [])
-
-    const handleCloseDelete = useCallback(() => {
-        setShowDeleteModal(false)
-        setSelectedTypeId(null)
-        fetchTypes()
-    }, [fetchTypes])
-
-    const handleOpenDelete = useCallback((id: string) => {
-        setSelectedTypeId(id)
-        setShowDeleteModal(true)
-    }, [])
-
-    const handleOpenCreate = useCallback(() => {
-        setShowCreateModal(true)
-    }, [])
-
-    const handleCloseCreate = useCallback(() => {
-        setShowCreateModal(false)
-        fetchTypes()
-    }, [fetchTypes])
-
+    const handleOpenDelete = (id: string) => {
+        openModal({
+            type: 'DELETE',
+            formId: 'typeDelete',
+            title: 'Delete Type',
+            btnTitle: 'Delete Type',
+            content: <DeleteTypeModal id={id} closeModal={closeModal} handleDelete={handleDelete} />,
+        })
+    }
     return (
         <motion.div variants={staggeredList} initial="hidden" animate="visible" className="space-y-8">
             {loading ? (
@@ -95,16 +65,15 @@ export default function TypesListPage() {
                             <p className="text-gray-600 mt-1">Manage your educational content</p>
                         </div>
                         <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={handleOpenCreate} className="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg flex items-center gap-2">
-                            <Plus className="w-5 h-5" />
                             Add Type
                         </motion.button>
                     </div>
-                    
+
                     <motion.div variants={containerVariants} initial="hidden" animate="visible" className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                         <AnimatePresence>
                             {types.map((type) => (
                                 <motion.div key={type.id} variants={itemVariants} layout whileHover={{ y: -5, scale: 1.02 }} className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 overflow-hidden relative">
-                                    <div className="h-96 overflow-auto p-6 scroll-none">
+                                    <div className="h-48 overflow-auto p-6 scroll-none">
                                         <div className="flex items-start justify-between mb-3">
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center gap-2 mb-2">
@@ -134,19 +103,8 @@ export default function TypesListPage() {
                             ))}
                         </AnimatePresence>
                     </motion.div>
-                    {types.length > 8 && (
-                        <div className="flex justify-center mt-8">
-                            <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="px-6 py-3 border border-gray-300 text-gray-700 hover:border-gray-400 rounded-xl transition-all duration-300 font-medium">
-                                Load More Types
-                            </motion.button>
-                        </div>
-                    )}
                 </motion.div>
             )}
-
-            {showEditModal && <EditTypeModal onClose={handleCloseEdit} id={selectedTypeId as string} />}
-            {showDeleteModal && <DeleteTypeModal onClose={handleCloseDelete} onConfirm={() => handleDelete(selectedTypeId as string)} isLoading={loading} />}
-            {showCreateModal && <CreateTypeModal onClose={handleCloseCreate} />}
         </motion.div>
     )
 }

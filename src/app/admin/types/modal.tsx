@@ -1,0 +1,116 @@
+'use client'
+import { useEffect, useState } from 'react'
+import { Trash2 } from 'lucide-react'
+import { Type, TypeEdit } from '@/types'
+
+interface TypeCreateModalProps {
+    closeModal: () => void
+    handleCreate(data: TypeEdit): Promise<void>
+}
+
+export const CreateTypeModal = ({ closeModal, handleCreate }: TypeCreateModalProps) => {
+    const [formData, setFormData] = useState<TypeEdit>({ title: '', description: '' })
+    return (
+        <form
+            onSubmit={async (e) => {
+                e.preventDefault()
+                await handleCreate(formData)
+                closeModal()
+            }}
+            id="typeCreate"
+            className="p-4 space-y-4 md:p-6 md:space-y-6"
+        >
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Title *</label>
+                <input type="text" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300" placeholder="Enter type title" />
+            </div>
+
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300" placeholder="Enter type description" />
+            </div>
+        </form>
+    )
+}
+
+interface TypeEditModalProps {
+    id: string
+    closeModal: () => void
+    fetchType: (id: string) => Promise<Type | undefined>
+    handleUpdate(id: string, data: TypeEdit): Promise<void>
+}
+
+export const EditTypeModal = ({ id, fetchType, closeModal, handleUpdate }: TypeEditModalProps) => {
+    const [formData, setFormData] = useState<TypeEdit | null>(null)
+    const [isFetchingData, setIsFetchingData] = useState(true)
+
+    useEffect(() => {
+        const loadStudentData = async () => {
+            setIsFetchingData(true)
+            const res = await fetchType(id)
+            if (res) {
+                setFormData(res)
+            }
+            setIsFetchingData(false)
+        }
+        loadStudentData()
+    }, [fetchType, id])
+
+    if (isFetchingData || !formData) {
+        return (
+            <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-100">
+                <div className="text-white">{isFetchingData ? 'Yuklanmoqda...' : "Ma'lumot topilmadi."}</div>
+            </div>
+        )
+    }
+
+    return (
+        <form
+            onSubmit={async (e) => {
+                e.preventDefault()
+                await handleUpdate(id, formData)
+                closeModal()
+            }}
+            id="typeEdit"
+            className="p-4 space-y-4 md:p-6 md:space-y-6"
+        >
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Title *</label>
+                <input type="text" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300" />
+            </div>
+
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300" />
+            </div>
+        </form>
+    )
+}
+
+interface TypeDeleteModalProps {
+    id: string
+    closeModal: () => void
+    handleDelete: (id: string) => Promise<void>
+}
+
+export const DeleteTypeModal = ({ id, closeModal, handleDelete }: TypeDeleteModalProps) => {
+    return (
+        <form
+            onSubmit={async (e) => {
+                e.preventDefault()
+                await handleDelete(id)
+                closeModal()
+            }}
+            id="typeDelete"
+            className="p-4 space-y-4 md:p-6 md:space-y-6"
+        >
+            <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Trash2 className="w-10 h-10 text-red-600" />
+            </div>
+
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">Delete Type</h3>
+            <p className="text-gray-600 mb-2">Are you sure you want to delete this type?</p>
+            <p className="text-sm text-gray-500 mb-6">This action cannot be undone. All Type data will be permanently removed from the system.</p>
+        </form>
+    )
+}

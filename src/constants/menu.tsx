@@ -8,7 +8,4 @@ export const AdminMenu = [
     { name: 'Support', href: '/admin/support', icon: <LifeBuoy className="w-5 h-5" /> },
 ]
 
-export const StudentMenu = [
-    { name: 'Home', href: '/student', icon: <Home className="w-5 h-5" /> },
-]
-
+export const StudentMenu = [{ name: 'Home', href: '/student', icon: <Home className="w-5 h-5" /> }]

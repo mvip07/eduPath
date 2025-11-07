@@ -3,24 +3,34 @@ import Image from 'next/image'
 import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Course } from '@/types'
+import { CourseEdit } from '@/types'
 import { useCourse } from '@/hooks/useCourse'
 import { useCourses } from '@/hooks/useCourses'
-import { Play, Clock, BookOpen, ChevronDown, CheckCircle, Lock, Download, Share2, Bookmark, ArrowLeft, Video, FileText, BarChart3, Award } from 'lucide-react'
+import { Play, Clock, BookOpen, ChevronDown, CheckCircle, Lock, Download, Share2, Bookmark, ArrowLeft, Video, FileText, BarChart3, Award, Loader2 } from 'lucide-react'
+import { useCourseContent } from '@/hooks/useCourseContent'
+import { useCourseSave } from '@/hooks/useCourseSave'
+import { getUserFromStorage } from '@/lib/helpers/userStore'
 
 export default function Lesson() {
-    const { id } = useParams<{ id: string }>()
     const router = useRouter()
+    const { id } = useParams<{ id: string }>()
+
     const { fetchCourse } = useCourses()
+    const { contents } = useCourseContent(id)
     const { modules, fetchModules, loading } = useCourse(id)
 
-    const [course, setCourse] = useState<Course | null>(null)
+    const userId = getUserFromStorage()?.user_id
+    const { isSaved, loading: saveLoading, toggleSave } = useCourseSave(userId as string)
+
+    const [course, setCourse] = useState<CourseEdit | null>(null)
     const [activeModule, setActiveModule] = useState<string | number | null>(null)
 
     useEffect(() => {
         const loadCourse = async () => {
             const res = await fetchCourse(id)
-            setCourse(res)
+            if (res) {
+                setCourse(res)
+            }
         }
         loadCourse()
     }, [id, fetchCourse])
@@ -32,45 +42,6 @@ export default function Lesson() {
         loadModules()
     }, [id, fetchModules])
 
-    // const mockLessons = {
-    //     1: [
-    //         { id: 1, title: 'Introduction to the Course', duration: '15:30', type: 'video', completed: true, locked: false },
-    //         { id: 2, title: 'Setting Up Development Environment', duration: '20:15', type: 'video', completed: true, locked: false },
-    //         { id: 3, title: 'Your First Project', duration: '25:45', type: 'practice', completed: false, locked: false },
-    //         { id: 4, title: 'Core Concepts Explained', duration: '30:20', type: 'video', completed: false, locked: false },
-    //     ],
-    //     2: [
-    //         { id: 5, title: 'Advanced Techniques', duration: '22:15', type: 'video', completed: false, locked: true },
-    //         { id: 6, title: 'Practical Exercises', duration: '18:30', type: 'practice', completed: false, locked: true },
-    //     ],
-    // }
-
-    // const getLessonIcon = (type: string) => {
-    //     switch (type) {
-    //         case 'video':
-    //             return <Video className="w-4 h-4" />
-    //         case 'practice':
-    //             return <FileText className="w-4 h-4" />
-    //         case 'quiz':
-    //             return <BarChart3 className="w-4 h-4" />
-    //         default:
-    //             return <Play className="w-4 h-4" />
-    //     }
-    // }
-
-    // const getLessonColor = (type: string) => {
-    //     switch (type) {
-    //         case 'video':
-    //             return 'bg-blue-100 text-blue-600'
-    //         case 'practice':
-    //             return 'bg-green-100 text-green-600'
-    //         case 'quiz':
-    //             return 'bg-purple-100 text-purple-600'
-    //         default:
-    //             return 'bg-gray-100 text-gray-600'
-    //     }
-    // }
-
     if (loading || !course) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50/30 flex items-center justify-center">
@@ -81,6 +52,8 @@ export default function Lesson() {
             </div>
         )
     }
+
+    const currentStatus = isSaved(id)
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50/30">
@@ -98,14 +71,11 @@ export default function Lesson() {
                         </div>
 
                         <div className="flex items-center gap-3">
-                            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-colors">
-                                <Bookmark className="w-5 h-5" />
+                            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => toggleSave(id)} className={`p-2 rounded-xl transition-colors flex items-center gap-2 ${currentStatus ? 'text-green-600 hover:bg-green-50' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'}`} disabled={loading}>
+                                {saveLoading ? <Loader2 className="w-5 h-5 animate-spin text-blue-500" /> : currentStatus ? <CheckCircle className="w-5 h-5" /> : <Bookmark className="w-5 h-5" />}
                             </motion.button>
                             <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-colors">
                                 <Share2 className="w-5 h-5" />
-                            </motion.button>
-                            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-colors">
-                                <Download className="w-5 h-5" />
                             </motion.button>
                         </div>
                     </div>
@@ -124,7 +94,19 @@ export default function Lesson() {
                             <div className="p-6">
                                 <h1 className="text-3xl font-bold text-gray-900 mb-4">{course.title}</h1>
                                 <p className="text-gray-600 leading-relaxed text-lg">{course.description}</p>
-
+                                <div className="mt-6 pt-6 border-t border-gray-200">
+                                    {contents.map((content) => (
+                                        <div key={content.id} className="content-card bg-white rounded-xl shadow-md overflow-hidden">
+                                            <div className="p-6">
+                                                <div className="flex justify-between items-start mb-4">
+                                                    <h3 className="text-xl font-bold text-gray-900">{content.title}</h3>
+                                                </div>
+                                                <p className="text-gray-600 mb-4">{content.description}</p>
+                                                <iframe className="w-full h-[600px] border rounded-xl" src={content.content_url}></iframe>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
                                 <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-gray-200">
                                     <div className="text-center">
                                         <div className="text-2xl font-bold text-gray-900">{modules.length}</div>

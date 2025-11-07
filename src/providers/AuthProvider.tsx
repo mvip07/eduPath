@@ -1,8 +1,8 @@
 'use client'
-import API from '@/utils/API'
 import { useRouter, usePathname } from 'next/navigation'
 import React, { createContext, useContext, useEffect } from 'react'
-import { getToken, getUserFromStorage, clearToken } from '@/utils/storage'
+import { getToken, getUserFromStorage, clearToken } from '@/lib/helpers/userStore'
+import API from '@/lib/axios'
 
 const AuthContext = createContext<undefined>(undefined)
 export const useAuth = () => {

@@ -1,16 +1,14 @@
 'use client'
 import { useState, useCallback, useEffect } from 'react'
 import { toast } from 'react-toastify'
-import { handleApiError } from '@/utils/handleError'
-import { typeService } from '@/services/typeService'
 import { Type, TypeEdit } from '@/types'
+import { typeService } from '@/services/typeService'
+import { handleApiError } from '@/lib/helpers/handleApiError'
 
 export const useTypes = () => {
-    // 🔹 States
     const [types, setTypes] = useState<Type[]>([])
     const [loading, setLoading] = useState(false)
 
-    // 🔹 GET ALL
     const fetchTypes = useCallback(async () => {
         setLoading(true)
         try {
@@ -23,21 +21,18 @@ export const useTypes = () => {
         }
     }, [])
 
-    const fetchType = useCallback(async (id: string): Promise<TypeEdit | null> => {
+    const fetchType = useCallback(async (id: string) => {
         setLoading(true)
         try {
-            const data = await typeService.getById(id)
-            return data
+            return await typeService.getById(id)
         } catch (err) {
             handleApiError(err, 'Ma’lumotni yuklab bo‘lmadi!')
-            return null
         } finally {
             setLoading(false)
         }
     }, [])
 
-    // 🔹 CREATE
-    const handleCreate = async (type: TypeEdit) => {
+    const handleCreate =  useCallback( async (type: TypeEdit) => {
         setLoading(true)
         try {
             await typeService.create(type)
@@ -48,35 +43,34 @@ export const useTypes = () => {
         } finally {
             setLoading(false)
         }
-    }
+    }, [fetchTypes])
 
-    // 🔹 EDIT
-    const handleUpdate = async (id: string, type: TypeEdit) => {
+    const handleUpdate = useCallback( async (id: string, type: TypeEdit) => {
         if (!type) return
         setLoading(true)
         try {
             await typeService.update(id, type)
             toast.success('Type ma’lumotlari yangilandi!')
+            await fetchTypes()
         } catch (err) {
             handleApiError(err, 'Yangilashda xatolik!')
         } finally {
             setLoading(false)
         }
-    }
+    }, [fetchTypes])
 
-    // 🔹 DELETE
-    const handleDelete = async (id: string) => {
+    const handleDelete = useCallback(async (id: string) => {
         setLoading(true)
         try {
             await typeService.delete(id)
             toast.success('Type muvaffaqiyatli o‘chirildi!')
-            fetchTypes()
+            await fetchTypes()
         } catch (err) {
             handleApiError(err, 'O‘chirishda xatolik yuz berdi!')
         } finally {
             setLoading(false)
         }
-    }
+    }, [fetchTypes])
 
     useEffect(() => {
         fetchTypes()

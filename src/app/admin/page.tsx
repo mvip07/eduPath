@@ -3,11 +3,13 @@ import { useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useCourses } from '@/hooks/useCourses'
 import { useStudents } from '@/hooks/useStudents'
-import { fadeUp, staggeredList } from '@/components/MotionUtils'
+import { fadeUp, staggeredList } from '@/lib/motion'
 import { Users, BookOpen, ChevronRight, MoreVertical } from 'lucide-react'
+import { useTypes } from '@/hooks/useTypes'
 
 export default function Dashboard() {
     const { students, loading } = useStudents()
+    const { types } = useTypes()
     const { courses, fetchCourses } = useCourses()
 
     useEffect(() => {
@@ -82,28 +84,35 @@ export default function Dashboard() {
                                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
                                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
                                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200">
-                                {students.slice(0, 6).map((student, index) => (
-                                    <motion.tr key={student.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }} className="hover:bg-gray-50  transition-colors group">
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="flex items-center">
-                                                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-semibold mr-3">{student.full_name.charAt(0)}</div>
-                                                <span className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors">{student.full_name}</span>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-gray-600">{student.username}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-gray-600">{student.phone_number}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800  capitalize">{student.role.toLowerCase()}</span>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${student.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>{student.is_active ? 'Active' : 'Inactive'}</span>
-                                        </td>
-                                    </motion.tr>
-                                ))}
+                                {students.slice(0, 6).map((student, index) => {
+                                    const type = types.find((t) => t.id === student.type_id)
+                                    return (
+                                        <motion.tr key={student.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }} className="hover:bg-gray-50  transition-colors group">
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="flex items-center">
+                                                    <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-semibold mr-3">{student.full_name.charAt(0)}</div>
+                                                    <span className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors">{student.full_name}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-gray-600">{student.username}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-gray-600">{student.phone_number}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800  capitalize">{student.role.toLowerCase()}</span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 capitalize">{type?.title || '—'}</div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${student.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>{student.is_active ? 'Active' : 'Inactive'}</span>
+                                            </td>
+                                        </motion.tr>
+                                    )
+                                })}
                             </tbody>
                         </table>
                     </div>

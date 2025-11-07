@@ -1,54 +1,47 @@
 'use client'
 import Image from 'next/image'
-import { useCallback, useState } from 'react'
-import { BookOpen, Edit, Plus, Trash2 } from 'lucide-react'
-import { motion } from 'framer-motion'
-import { useCourses } from '@/hooks/useCourses'
-import { EditCourseModal } from './edit/modal'
-import { CreateCourseModal } from './create/modal'
-import { DeleteCourseModal } from './delete/modal'
-import { fadeUp, staggeredList } from '@/components/MotionUtils'
 import { useRouter } from 'next/navigation'
+import { motion } from 'framer-motion'
+import { BookOpen, Edit, Trash2 } from 'lucide-react'
+import { useCourses } from '@/hooks/useCourses'
+import { useModal } from '@/components/UI/Modal'
+import { fadeUp, staggeredList } from '@/lib/motion'
+import { CreateCourseModal, DeleteCourseModal, EditCourseModal } from './modal'
 
 export default function CoursesPage() {
     const router = useRouter()
-    const { loading, courses, deleteCourse, fetchCourses } = useCourses()
+    const { openModal, closeModal } = useModal()
+    const { loading, courses, fetchCourse, createCourse, updateCourse, deleteCourse } = useCourses()
 
-    const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null)
-    const [showEditModal, setShowEditModal] = useState(false)
-    const [showDeleteModal, setShowDeleteModal] = useState(false)
-    const [showCreateModal, setShowCreateModal] = useState(false)
+    const handleOpenCreate = () => {
+        openModal({
+            type: 'CREATE',
+            formId: 'courseCreate',
+            title: 'Create Course',
+            btnTitle: 'Create Course',
+            content: <CreateCourseModal closeModal={closeModal} handleCreate={createCourse} />,
+        })
+    }
 
-    const handleCloseEdit = useCallback(() => {
-        setShowEditModal(false)
-        setSelectedCourseId(null)
-        fetchCourses()
-    }, [fetchCourses])
+    const handleOpenEdit = (id: string) => {
+        openModal({
+            type: 'EDIT',
+            formId: 'courseEdit',
+            title: 'Edit Course',
+            btnTitle: 'Edit Course',
+            content: <EditCourseModal id={id} closeModal={closeModal} fetchCourse={fetchCourse} handleUpdate={updateCourse} />,
+        })
+    }
 
-    const handleOpenEdit = useCallback((id: string) => {
-        setSelectedCourseId(id)
-        setShowEditModal(true)
-    }, [])
-
-    const handleCloseDelete = useCallback(() => {
-        setShowDeleteModal(false)
-        setSelectedCourseId(null)
-        fetchCourses()
-    }, [fetchCourses])
-
-    const handleOpenDelete = useCallback((id: string) => {
-        setSelectedCourseId(id)
-        setShowDeleteModal(true)
-    }, [])
-
-    const handleOpenCreate = useCallback(() => {
-        setShowCreateModal(true)
-    }, [])
-
-    const handleCloseCreate = useCallback(() => {
-        setShowCreateModal(false)
-        fetchCourses()
-    }, [fetchCourses])
+    const handleOpenDelete = (id: string) => {
+        openModal({
+            type: 'DELETE',
+            formId: 'courseDelete',
+            title: 'Delete Course',
+            btnTitle: 'Delete Course',
+            content: <DeleteCourseModal id={id} closeModal={closeModal} handleDelete={deleteCourse} />,
+        })
+    }
 
     return (
         <motion.div variants={staggeredList} initial="hidden" animate="visible" className="space-y-8">
@@ -75,16 +68,14 @@ export default function CoursesPage() {
                             <h2 className="text-2xl font-bold text-gray-900">All Courses</h2>
                             <p className="text-gray-600 mt-1">Manage your educational content</p>
                         </div>
-                        <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={handleOpenCreate} className="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg flex items-center gap-2">
-                            <Plus className="w-5 h-5" />
+                        <button onClick={handleOpenCreate} className="px-6 py-3 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition">
                             Add Course
-                        </motion.button>
+                        </button>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                         {courses.map((course, index) => (
                             <motion.div key={course.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }} whileHover={{ y: -5, scale: 1.02 }} className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 overflow-hidden">
-                                {/* Course Image/Thumbnail */}
                                 <div className="relative h-56 bg-gradient-to-br from-blue-500 to-purple-600 overflow-hidden">
                                     {course.image_url ? (
                                         <Image src={course.image_url} alt={course.title} width={100} height={100} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
@@ -108,10 +99,10 @@ export default function CoursesPage() {
 
                                     <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                                         <div className="flex items-center gap-2">
-                                            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => handleOpenEdit(String(course.id))} className="p-2 text-blue-600 hover:bg-blue-50 rounded-xl transition-colors" title="Edit Course">
+                                            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => handleOpenEdit(course.id)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-xl transition-colors" title="Edit Course">
                                                 <Edit className="w-4 h-4" />
                                             </motion.button>
-                                            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => handleOpenDelete(String(course.id))} className="p-2 text-red-600 hover:bg-red-50 rounded-xl transition-colors" title="Delete Course">
+                                            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => handleOpenDelete(course.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-xl transition-colors" title="Delete Course">
                                                 <Trash2 className="w-4 h-4" />
                                             </motion.button>
                                         </div>
@@ -126,21 +117,8 @@ export default function CoursesPage() {
                             </motion.div>
                         ))}
                     </div>
-
-                    {courses.length > 8 && (
-                        <div className="flex justify-center mt-8">
-                            <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="px-6 py-3 border border-gray-300 text-gray-700 hover:border-gray-400 rounded-xl transition-all duration-300 font-medium">
-                                Load More Courses
-                            </motion.button>
-                        </div>
-                    )}
                 </motion.div>
             )}
-
-            {/* Modals */}
-            {showEditModal && <EditCourseModal onClose={handleCloseEdit} id={selectedCourseId as string} />}
-            {showDeleteModal && <DeleteCourseModal onClose={handleCloseDelete} onConfirm={() => deleteCourse(selectedCourseId as string)} isLoading={loading} />}
-            {showCreateModal && <CreateCourseModal onClose={handleCloseCreate} />}
         </motion.div>
     )
 }

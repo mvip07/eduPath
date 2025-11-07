@@ -1,5 +1,5 @@
 import { Type, TypeEdit } from '@/types'
-import API from '@/utils/API'
+import API from '@/lib/axios'
 
 export const typeService = {
     async getAll(): Promise<Type[]> {

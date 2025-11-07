@@ -4,7 +4,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { LogOut } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { MenuItem } from '@/types'
-import { clearToken } from '@/utils/storage'
+import { clearToken } from '@/lib/helpers/userStore'
 
 export default function Sidebar({ isSidebarOpen, menuItems, setIsSidebarOpen }: { isSidebarOpen: boolean; menuItems: MenuItem[]; setIsSidebarOpen: React.Dispatch<React.SetStateAction<boolean>> }) {
     const pathname = usePathname()
@@ -45,9 +45,9 @@ export default function Sidebar({ isSidebarOpen, menuItems, setIsSidebarOpen }: 
 
     return (
         <>
-            {isSidebarOpen && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsSidebarOpen(false)} className="fixed inset-0 bg-black/50 z-40 lg:hidden" />}
+            {isSidebarOpen && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsSidebarOpen(false)} className="fixed inset-0 bg-black/50 z-5 lg:hidden" />}
 
-            <motion.aside animate={{ x: isSidebarOpen ? 0 : -320 }} transition={{ type: 'spring', stiffness: 300, damping: 30 }} className={`fixed top-0 left-0 h-full w-80 z-50 bg-gradient-to-b from-white to-gray-50 border-r border-gray-200 shadow-2xl lg:top-21 lg:h-[calc(100dvh-84px)] lg:translate-x-0 lg:fixed ${isSidebarOpen ? '' : 'translate-x-[-320px]'}`}>
+            <motion.aside animate={{ x: isSidebarOpen ? 0 : -320 }} transition={{ type: 'spring', stiffness: 300, damping: 30 }} className={`fixed top-0 left-0 h-full w-80 z-10 bg-gradient-to-b from-white to-gray-50 border-r border-gray-200 shadow-2xl lg:top-21 lg:h-[calc(100dvh-84px)] lg:translate-x-0 lg:fixed ${isSidebarOpen ? '' : 'translate-x-[-320px]'}`}>
                 <motion.div initial="hidden" animate="visible" className="flex flex-col w-full h-full">
                     <div className="p-6 flex items-center justify-between border-b border-gray-200">
                         <motion.h1 initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">

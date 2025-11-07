@@ -1,5 +1,5 @@
-import Layout from '@/components/Layout'
-import { StudentMenu } from '@/utils/menuList'
+import Layout from '@/components/layout/LayoutWrapper'
+import { StudentMenu } from '@/constants/menu'
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
     return (

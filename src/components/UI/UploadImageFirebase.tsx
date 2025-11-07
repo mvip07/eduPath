@@ -3,10 +3,17 @@ import Image from 'next/image'
 import { useRef, useState } from 'react'
 import { toast } from 'react-toastify'
 import { motion } from 'framer-motion'
-import { ImagePlus, Loader2 } from 'lucide-react'
-import { uploadImageToFirebase } from '@/utils/uploadImageToFirebase'
+import { FileText, ImagePlus, Loader2 } from 'lucide-react'
+import { uploadFileToFirebase } from '@/lib/helpers/uploadImage'
 
-export const ImageUploader = ({ imageUrl, onChange }: { imageUrl: string; onChange: (url: string) => void }) => {
+interface FileUploaderProps {
+    fileUrl: string
+    folder: string
+    type?: 'image' | 'pdf' | 'any'
+    onChange: (url: string) => void
+}
+
+export const FileUploader = ({ fileUrl, folder, type = 'any', onChange }: FileUploaderProps) => {
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [uploading, setUploading] = useState(false)
     const [progress, setProgress] = useState(0)
@@ -14,9 +21,9 @@ export const ImageUploader = ({ imageUrl, onChange }: { imageUrl: string; onChan
     const handleFileUpload = async (file: File) => {
         try {
             setUploading(true)
-            const url = await uploadImageToFirebase(file, setProgress)
+            const url = await uploadFileToFirebase(file, folder, setProgress)
             onChange(url)
-            toast.success('Image uploaded successfully!')
+            toast.success('File uploaded successfully!')
         } catch {
             toast.error('Upload failed!')
         } finally {
@@ -26,13 +33,26 @@ export const ImageUploader = ({ imageUrl, onChange }: { imageUrl: string; onChan
 
     return (
         <div className="w-full flex flex-col items-center gap-3">
-            {imageUrl ? (
+            {/* FILE PREVIEW */}
+            {type === 'image' && fileUrl ? (
                 <motion.div whileHover={{ scale: 1.02 }} className="relative w-full h-60 rounded-2xl overflow-hidden border border-gray-200 shadow">
-                    <Image src={imageUrl} alt="Preview" width={100} height={100} className="w-full h-full object-cover" />
+                    <Image src={fileUrl} alt="Preview" width={100} height={100} className="w-full h-full object-cover" />
                     <button onClick={() => fileInputRef.current?.click()} className="absolute inset-0 bg-black/40 text-white opacity-0 hover:opacity-100 flex items-center justify-center transition-all">
                         Change Image
                     </button>
                 </motion.div>
+            ) : type === 'pdf' && fileUrl ? (
+                <div className="w-full flex items-center justify-between border p-3 rounded-xl bg-gray-50">
+                    <div className="flex items-center gap-2">
+                        <FileText className="text-blue-600" />
+                        <a href={fileUrl} target="_blank" className="text-blue-600 underline text-sm">
+                            View PDF
+                        </a>
+                    </div>
+                    <button onClick={() => fileInputRef.current?.click()} className="text-sm text-gray-600 hover:text-blue-600">
+                        Change
+                    </button>
+                </div>
             ) : (
                 <div onClick={() => fileInputRef.current?.click()} className="w-full border-2 border-dashed border-gray-300 rounded-2xl h-48 flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all">
                     {uploading ? (
@@ -42,23 +62,25 @@ export const ImageUploader = ({ imageUrl, onChange }: { imageUrl: string; onChan
                         </div>
                     ) : (
                         <>
-                            <ImagePlus className="w-10 h-10 text-gray-400 mb-2" />
-                            <p className="text-gray-500 text-sm">Click to upload image</p>
+                            {type === 'image' ? <ImagePlus className="w-10 h-10 text-gray-400 mb-2" /> : <FileText className="w-10 h-10 text-gray-400 mb-2" />}
+                            <p className="text-gray-500 text-sm">Click to upload {type === 'image' ? 'image' : type === 'pdf' ? 'PDF' : 'file'}</p>
                         </>
                     )}
                 </div>
             )}
+
             <input
                 type="file"
                 ref={fileInputRef}
-                accept="image/*"
+                accept={type === 'image' ? 'image/*' : type === 'pdf' ? 'application/pdf' : '*/*'}
                 className="hidden"
                 onChange={(e) => {
                     const file = e.target.files?.[0]
                     if (file) handleFileUpload(file)
                 }}
             />
-            <input type="url" value={imageUrl} onChange={(e) => onChange(e.target.value)} placeholder="Or paste image URL" className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+
+            <input type="url" value={fileUrl} onChange={(e) => onChange(e.target.value)} placeholder={`Or paste ${type === 'image' ? 'image' : type === 'pdf' ? 'PDF' : 'file'} URL`} className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
         </div>
     )
 }

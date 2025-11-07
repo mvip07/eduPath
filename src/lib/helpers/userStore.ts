@@ -1,7 +1,6 @@
-import { StoredAuth } from "@/types"
+import { StoredAuth } from '@/types'
 
 const TOKEN_KEY = process.env.NEXT_PUBLIC_EDUPATH_TOKEN || 'EDUPATH_TOKEN'
-
 
 export const getToken = (): string => {
     if (typeof window === 'undefined') return ''

@@ -2,79 +2,65 @@ export type Role = 'STUDENT' | 'ADMIN'
 
 export interface Student {
     id: string
-    full_name: string
-    username: string
-    phone_number: string
     role: Role
+    type_id: string
+    username: string
+    full_name: string
     is_active: boolean
-    active_term?: number
+    active_term: number
+    phone_number: string
 }
 
 export interface StudentEdit {
     role: Role
-    active_term: 0
-    is_active: true
+    type_id: string
     username: string
     password: string
     full_name: string
+    is_active: boolean
+    active_term: number
     phone_number: string
 }
 
-export interface CreateStudent extends Omit<StudentEdit, 'is_active' | 'active_term'> {
-    active_term: number
-    password: string
-}
-
 export interface Course {
-    id: number | string
+    id: string
     title: string
     level: string
+    type_id: string
     image_url: string
     description: string
     is_active?: boolean
     created_at?: string
 }
 
-export interface CreateCourse {
+export interface CourseEdit {
     title: string
-    description: string
     level: string
+    type_id: string
     image_url: string
-}
-
-export interface UpdateCourse {
-    title?: string
-    description?: string
-    level?: string
-    image_url?: string
-    is_active?: boolean
+    is_active: boolean
+    description: string
 }
 
 export interface Module {
-    title: string
-    order?: number
-    id: number | string
-    description?: string
-}
-
-export interface CreateModule {
+    id: string
     title: string
     order: number
     description: string
 }
 
-export interface UpdateModule {
+export interface ModuleEdit {
     title: string
     order: number
     description: string
 }
 
 export interface Lesson {
-    id: number | string
+    id: string
     title: string
-    description?: string
-    video_url?: string
-    materials?: string
+    video_url: string
+    materials: string
+    description: string
 }
 
 export interface ModulePayload {
@@ -85,22 +71,17 @@ export interface ModulePayload {
 
 export type User = {
     id: string
+    role: Role
     username: string
     full_name: string
-    role: 'STUDENT' | 'ADMIN'
 }
 
-// export interface AuthContextProps {
-//     user: User | null
-//     loading: boolean
-//     setUser: React.Dispatch<React.SetStateAction<User | null>>
-// }
-
 export interface StoredAuth {
+    user_id: string
+    type_id: string
     full_name: string
-    id: string | number
     access_token: string
-    role: 'ADMIN' | 'STUDENT'
+    role: Role
 }
 
 export interface MenuItem {
@@ -110,7 +91,7 @@ export interface MenuItem {
 }
 
 export interface Type {
-    id: number | string
+    id: string
     title: string
     description: string
 }
@@ -118,4 +99,17 @@ export interface Type {
 export interface TypeEdit {
     title: string
     description: string
+}
+
+export interface CourseContent {
+    id: string
+    title: string
+    content_url: string
+    description: string
+}
+
+export interface CourseContentEdit {
+    title?: string
+    content_url?: string
+    description?: string
 }

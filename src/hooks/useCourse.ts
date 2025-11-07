@@ -1,20 +1,12 @@
-import { FormEvent, useCallback, useEffect, useState } from 'react'
-import { Module, Lesson, CreateModule, UpdateModule } from '@/types'
-import API from '@/utils/API'
+import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
-import type { AxiosError } from 'axios'
+import API from '@/lib/axios'
+import { Module, Lesson, ModuleEdit } from '@/types'
+import { handleApiError } from '@/lib/helpers/handleApiError'
 
-export const useCourse = (courseId?: string | number) => {
+export const useCourse = (courseId?: string) => {
     const [modules, setModules] = useState<Module[]>([])
     const [loading, setLoading] = useState(false)
-    const [error, setError] = useState<string | null>(null)
-
-    const handleAxiosError = (err: unknown, defaultMsg: string) => {
-        const axiosErr = err as AxiosError<{ message?: string }>
-        const msg = axiosErr.response?.data?.message ?? defaultMsg
-        setError(msg)
-        toast.error(msg)
-    }
 
     const fetchModules = useCallback(async () => {
         if (!courseId) return
@@ -23,7 +15,7 @@ export const useCourse = (courseId?: string | number) => {
             const res = await API.get(`/api/course_module/course/${courseId}`)
             setModules(res.data.result)
         } catch (err) {
-            handleAxiosError(err, 'Module yaratishda xatolik!')
+            handleApiError(err, 'Module yaratishda xatolik!')
         } finally {
             setLoading(false)
         }
@@ -35,70 +27,68 @@ export const useCourse = (courseId?: string | number) => {
             const res = await API.get(`/api/course_module/${courseId}`)
             return res.data.result
         } catch (err) {
-            handleAxiosError(err, 'Ma’lumotni yuklab bo‘lmadi!')
+            handleApiError(err, 'Ma’lumotni yuklab bo‘lmadi!')
             return null
         } finally {
             setLoading(false)
         }
     }, [])
 
-    const createModule = async (e: FormEvent, module: CreateModule) => {
-        e.preventDefault()
+    const createModule = useCallback( async ( module: ModuleEdit) => {
         setLoading(true)
         try {
             await API.post(`/api/course_module/course/${courseId}`, module)
             toast.success('Module yaratildi')
             await fetchModules()
         } catch (err) {
-            handleAxiosError(err, 'Module yaratishda xatolik!')
+            handleApiError(err, 'Module yaratishda xatolik!')
         } finally {
             setLoading(false)
         }
-    }
+    }, [courseId, fetchModules])
 
-    const updateModule = async (moduleId: string, module: UpdateModule) => {
+    const updateModule =  useCallback( async (moduleId: string, module: ModuleEdit) => {
         if (!module) return
         setLoading(true)
         try {
-            const res = API.patch(`/api/course_module/${moduleId}`, module)
+            await API.patch(`/api/course_module/${moduleId}`, module)
             toast.success('Module yangilandi')
             await fetchModules()
-            return res
-        } catch (err: unknown) {
-            handleAxiosError(err, 'Yangilashda xatolik')
+        } catch (err) {
+            handleApiError(err, 'Yangilashda xatolik')
         } finally {
             setLoading(false)
         }
-    }
+    }, [fetchModules])
 
-    const deleteModule = async (moduleId: string) => {
+    const deleteModule = useCallback( async (moduleId: string) => {
         setLoading(true)
         try {
             await API.delete(`/api/course_module/${moduleId}`)
             toast.success('Module o‘chirildi')
             await fetchModules()
-        } catch (err: unknown) {
-            handleAxiosError(err, 'O‘chirishda xatolik')
+        } catch (err) {
+            handleApiError(err, 'O‘chirishda xatolik')
         } finally {
             setLoading(false)
         }
-    }
+    }, [fetchModules])
 
-    const createLesson = async (moduleId: string | number, payload: Partial<Lesson>) => {
+    const createLesson = async (moduleId: string, payload: Partial<Lesson>) => {
         const res = await API.post(`/api/course/${courseId}/modules/${moduleId}/lessons`, payload)
         toast.success('Dars yaratildi')
         await fetchModules()
         return res
     }
 
-    const updateLesson = async (moduleId: string | number, lessonId: string | number, payload: Partial<Lesson>) => {
+    const updateLesson = async (moduleId: string, lessonId: string, payload: Partial<Lesson>) => {
         const res = await API.patch(`/api/course/${courseId}/modules/${moduleId}/lessons/${lessonId}`, payload)
         toast.success('Dars yangilandi')
         await fetchModules()
         return res
     }
 
-    const deleteLesson = async (moduleId: string | number, lessonId: string | number) => {
+    const deleteLesson = async (moduleId: string, lessonId: string) => {
         await API.delete(`/api/course/${courseId}/modules/${moduleId}/lessons/${lessonId}`)
         toast.success('Dars o‘chirildi')
         await fetchModules()
@@ -108,5 +98,5 @@ export const useCourse = (courseId?: string | number) => {
         fetchModules()
     }, [fetchModules])
 
-    return { modules, loading, error, fetchModule, fetchModules, createModule, updateModule, deleteModule, createLesson, updateLesson, deleteLesson }
+    return { modules, loading, fetchModule, fetchModules, createModule, updateModule, deleteModule, createLesson, updateLesson, deleteLesson }
 }

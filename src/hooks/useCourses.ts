@@ -1,81 +1,75 @@
-import { FormEvent, useCallback, useEffect, useState } from 'react'
-import { Course, CreateCourse, UpdateCourse } from '@/types'
-import { courseService } from '@/services/courseService'
+import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
-import type { AxiosError } from 'axios'
+import { Course, CourseEdit } from '@/types'
+import { courseService } from '@/services/courseService'
+import { handleApiError } from '@/lib/helpers/handleApiError'
 
 export const useCourses = () => {
-    const [courses, setCourses] = useState<Course[]>([])
     const [loading, setLoading] = useState(false)
-    const [error, setError] = useState<string | null>(null)
-
-    const handleAxiosError = (err: unknown, defaultMsg: string) => {
-        const axiosErr = err as AxiosError<{ message?: string }>
-        const msg = axiosErr.response?.data?.message ?? defaultMsg
-        setError(msg)
-        toast.error(msg)
-    }
+    const [courses, setCourses] = useState<Course[]>([])
 
     const fetchCourses = useCallback(async () => {
         setLoading(true)
-        setError(null)
         try {
             const res = await courseService.getAll()
             setCourses(res)
-        } catch (err: unknown) {
-            handleAxiosError(err, 'Courselarni yuklashda xatolik')
+        } catch (err) {
+            handleApiError(err, 'Courselarni yuklashda xatolik')
         } finally {
             setLoading(false)
         }
     }, [])
 
-    const fetchCourse = useCallback(async (id: string): Promise<Course | null> => {
+    const fetchCourse = useCallback(async (id: string) => {
         setLoading(true)
         try {
-            const data = await courseService.getById(id)
-            return data
+            return await courseService.getById(id)
         } catch (err) {
-            handleAxiosError(err, 'Ma’lumotni yuklab bo‘lmadi!')
-            return null
+            handleApiError(err, 'Ma’lumotni yuklab bo‘lmadi!')
         } finally {
             setLoading(false)
         }
     }, [])
 
-    const createCourse = async (e: FormEvent, course: CreateCourse) => {
-        e.preventDefault()
-        if (!course) return
+    const createCourse = useCallback(async (course: CourseEdit) => {
         setLoading(true)
         try {
             await courseService.create(course)
+            fetchCourses()
             toast.success('Course yaratildi')
         } catch (err) {
-            handleAxiosError(err, 'Course yaratishda xatolik')
+            handleApiError(err, 'Course yaratishda xatolik')
         } finally {
             setLoading(false)
         }
-    }
+    }, [fetchCourses])
 
-    const updateCourse = async (id: string, payload: UpdateCourse) => {
+    const updateCourse = useCallback(async (id: string, course: CourseEdit) => {
+        if (!id || !course) 
+        setLoading(true)
         try {
-            const res = await courseService.update(id, payload)
+            await courseService.update(id, course)
+            fetchCourses()
             toast.success('Course yangilandi')
-            await fetchCourses()
-            return res
-        } catch (err: unknown) {
-            handleAxiosError(err, 'Yangilashda xatolik')
+        } catch (err) {
+            handleApiError(err, 'Yangilashda xatolik')
+        } finally {
+            setLoading(false)
         }
-    }
+    }, [fetchCourses])
 
-    const deleteCourse = async (id: string | number) => {
+    const deleteCourse = useCallback(async (id: string) => {
+        setLoading(true)
         try {
             await courseService.delete(id)
             toast.success('Course o‘chirildi')
-            await fetchCourses()
-        } catch (err: unknown) {
-            handleAxiosError(err, 'O‘chirishda xatolik')
+            fetchCourses()
+        } catch (err) {
+            handleApiError(err, 'O‘chirishda xatolik')
+        } finally {
+            setLoading(false)
         }
-    }
+    }, [fetchCourses])
 
     useEffect(() => {
         fetchCourses()
@@ -84,7 +78,6 @@ export const useCourses = () => {
     return {
         courses,
         loading,
-        error,
         fetchCourse,
         fetchCourses,
         createCourse,

@@ -1,3 +1,5 @@
+import { TypesProvider } from '@/context/TypesContext'
+
 export default function Rootlayout({ children }: Readonly<{ children: React.ReactNode }>) {
-    return children
+    return <TypesProvider>{children}</TypesProvider>
 }

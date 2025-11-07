@@ -1,5 +1,5 @@
-import API from '@/utils/API'
-import { CreateStudent, Student, StudentEdit } from '@/types/index'
+import API from '@/lib/axios'
+import { Student, StudentEdit } from '@/types/index'
 
 export const studentService = {
     async getAll(): Promise<Student[]> {
@@ -12,7 +12,7 @@ export const studentService = {
         return res.data.result
     },
 
-    async create(data: CreateStudent): Promise<void> {
+    async create(data: StudentEdit): Promise<void> {
         await API.post('/api/user/', data)
     },
 

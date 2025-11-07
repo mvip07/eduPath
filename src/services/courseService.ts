@@ -1,5 +1,5 @@
-import API from '@/utils/API'
-import { Course, CreateCourse, UpdateCourse } from '@/types'
+import API from '@/lib/axios'
+import { Course, CourseEdit } from '@/types'
 
 export const courseService = {
     async getAll(): Promise<Course[]> {
@@ -7,16 +7,16 @@ export const courseService = {
         return res.data.result
     },
 
-    async getById(id: string): Promise<Course> {
+    async getById(id: string): Promise<CourseEdit> {
         const res = await API.get(`/api/course/${id}`)
         return res.data.result
     },
 
-    async create(data: CreateCourse): Promise<void> {
+    async create(data: CourseEdit): Promise<void> {
         await API.post('/api/course/', data)
     },
 
-    async update(id: string, data: UpdateCourse): Promise<void> {
+    async update(id: string, data: CourseEdit): Promise<void> {
         await API.patch(`/api/course/${id}`, data)
     },
 

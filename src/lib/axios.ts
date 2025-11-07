@@ -1,6 +1,6 @@
 import axios from 'axios'
-import { HOST } from './HOST'
-import { clearToken } from './storage'
+import { HOST } from './constants'
+import { clearToken } from './helpers/userStore'
 
 const containsFiles = (data: unknown): boolean => {
     if (typeof data !== 'object' || data === null) return false

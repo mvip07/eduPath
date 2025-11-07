@@ -1,7 +1,7 @@
-"use client"
-import { getUserFromStorage } from '@/utils/storage'
-import { useRouter } from 'next/navigation'
+'use client'
 import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { getUserFromStorage } from '@/lib/helpers/userStore'
 
 export default function Home() {
     const router = useRouter()

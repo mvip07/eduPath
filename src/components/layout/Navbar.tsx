@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Bell, Menu, Search } from 'lucide-react'
 import { StoredAuth } from '@/types'
-import { getUserFromStorage } from '@/utils/storage'
+import { getUserFromStorage } from '@/lib/helpers/userStore'
 
 export default function Navbar({ setIsSidebarOpen }: { setIsSidebarOpen: React.Dispatch<React.SetStateAction<boolean>> }) {
     const [user, setUser] = useState<StoredAuth | null>(null)
@@ -14,7 +14,7 @@ export default function Navbar({ setIsSidebarOpen }: { setIsSidebarOpen: React.D
         }, 0)
     }, [])
     return (
-        <motion.header initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="w-full fixed top-0 z-30 lg:z-60 bg-white/80 backdrop-blur-xl border-b border-gray-200">
+        <motion.header initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="w-full fixed top-0 lg:z-60 bg-white/80 backdrop-blur-xl border-b border-gray-200">
             <div className="px-6 py-4">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
