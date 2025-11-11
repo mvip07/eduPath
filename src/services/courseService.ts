@@ -23,4 +23,28 @@ export const courseService = {
     async delete(id: string | number): Promise<void> {
         await API.delete(`/api/course/${id}`)
     },
+
+    async getAllModule(): Promise<Course[]> {
+        const res = await API.get('/api/course/')
+        return res.data.result
+    },
+
+    /* ======================== Course Module ======================== */
+
+    async getByIdModule(id: string): Promise<CourseEdit> {
+        const res = await API.get(`/api/course/${id}`)
+        return res.data.result
+    },
+
+    async createModule(data: CourseEdit): Promise<void> {
+        await API.post('/api/course/', data)
+    },
+
+    async updateModule(id: string, data: CourseEdit): Promise<void> {
+        await API.patch(`/api/course/${id}`, data)
+    },
+
+    async deleteModule(id: string | number): Promise<void> {
+        await API.delete(`/api/course/${id}`)
+    },
 }

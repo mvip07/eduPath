@@ -58,8 +58,21 @@ export interface ModuleEdit {
 export interface Lesson {
     id: string
     title: string
+    order: number
+    content: string
+    duration: string
     video_url: string
-    materials: string
+    cover_url: string
+    description: string
+}
+
+export interface LessonPayload {
+    title: string
+    order: number
+    content: string
+    duration: string
+    video_url: string
+    cover_url: string
     description: string
 }
 
@@ -113,3 +126,35 @@ export interface CourseContentEdit {
     content_url?: string
     description?: string
 }
+
+export interface LessonMaterial {
+    id: string
+    title: string
+    description: string
+    material_url: string
+}
+
+export interface LessonMaterialPayload {
+    title: string
+    description: string
+    material_url: string
+}
+
+export type NotificationTYPE = "SUCCSESS" | "INFO" | "WARNING" | "ERROR"
+
+export interface Notification {
+    id: string
+    title: string
+    message: string
+    is_global: boolean
+    created_at: string
+    type: NotificationTYPE
+}
+
+export interface NotificationPayload {
+    title: string
+    message: string
+    is_global: boolean
+    type: NotificationTYPE
+}
+

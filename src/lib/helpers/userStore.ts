@@ -1,4 +1,5 @@
 import { StoredAuth } from '@/types'
+import { redirectToLogin } from './redirectToLogin'
 
 const TOKEN_KEY = process.env.NEXT_PUBLIC_EDUPATH_TOKEN || 'EDUPATH_TOKEN'
 
@@ -17,6 +18,7 @@ export const getToken = (): string => {
 export const clearToken = () => {
     if (typeof window === 'undefined') return
     localStorage.removeItem(TOKEN_KEY)
+    redirectToLogin()
 }
 
 export const setToken = (tokenData: unknown): void => {

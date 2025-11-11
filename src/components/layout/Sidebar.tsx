@@ -10,16 +10,16 @@ export default function Sidebar({ isSidebarOpen, menuItems, setIsSidebarOpen }: 
     const pathname = usePathname()
     const router = useRouter()
 
-    const isActive = (href: string) => {
-        if (pathname === href) {
-            return true
-        }
+    // const isActive = (href: string) => {
+    //     if (pathname === href) {
+    //         return true
+    //     }
 
-        if (pathname.startsWith(`${href}/`)) {
-            return true
-        }
-        return false
-    }
+    //     if (pathname.startsWith(`${href}/`)) {
+    //         return true
+    //     }
+    //     return false
+    // }
 
     const getActiveHref = (path: string, items: MenuItem[]) => {
         let bestMatchHref = ''

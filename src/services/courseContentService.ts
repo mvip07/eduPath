@@ -12,6 +12,16 @@ export const courseContentService = {
         return res.data.result
     },
 
+    async getCount(id: string): Promise<{
+        lesson_count: number
+        course_module_count: number
+        course_content_count: number
+        lesson_total_duration: string
+    }> {
+        const res = await API.get(`/api/course/counts/${id}`)
+        return res.data.result
+    },
+
     async create(courseId: string, data: CourseContentEdit) {
         await API.post(`/api/course_content/course/${courseId}`, data)
     },

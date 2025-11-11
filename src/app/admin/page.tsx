@@ -4,12 +4,14 @@ import { motion } from 'framer-motion'
 import { useCourses } from '@/hooks/useCourses'
 import { useStudents } from '@/hooks/useStudents'
 import { fadeUp, staggeredList } from '@/lib/motion'
-import { Users, BookOpen, ChevronRight, MoreVertical } from 'lucide-react'
+import { Users, BookOpen, ChevronRight } from 'lucide-react'
 import { useTypes } from '@/hooks/useTypes'
+import { useRouter } from 'next/navigation'
 
 export default function Dashboard() {
-    const { students, loading } = useStudents()
+    const router = useRouter()
     const { types } = useTypes()
+    const { students, loading } = useStudents()
     const { courses, fetchCourses } = useCourses()
 
     useEffect(() => {
@@ -29,23 +31,21 @@ export default function Dashboard() {
             </motion.div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <motion.div variants={fadeUp} className="group relative bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100">
+                <motion.div onClick={() => router.push("/admin/students")} variants={fadeUp} className="group relative bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100">
                     <div className="flex items-center justify-between mb-4">
                         <div className="p-3 rounded-xl bg-blue-50 ">
                             <Users className="w-6 h-6 text-blue-600 " />
                         </div>
-                        <MoreVertical className="w-5 h-5 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">{students.length}</h3>
                     <p className="text-gray-600 mb-2">Total Students</p>
                 </motion.div>
 
-                <motion.div variants={fadeUp} className="group relative bg-white  rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100">
+                <motion.div onClick={() => router.push("/admin/courses")} variants={fadeUp} className="group relative bg-white  rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100">
                     <div className="flex items-center justify-between mb-4">
                         <div className="p-3 rounded-xl bg-green-50">
                             <BookOpen className="w-6 h-6 text-green-600" />
                         </div>
-                        <MoreVertical className="w-5 h-5 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
                     <h3 className="text-2xl font-bold text-gray-900  mb-2">{courses.length}</h3>
                     <p className="text-gray-600 mb-2">Total Courses</p>
@@ -70,7 +70,7 @@ export default function Dashboard() {
                     <div className="px-6 py-4 border-b border-gray-200 ">
                         <div className="flex items-center justify-between">
                             <h3 className="text-lg font-semibold text-gray-900 ">Recent Students</h3>
-                            <button className="text-sm text-blue-600 hover:text-blue-700 transition-colors flex items-center">
+                            <button onClick={() => router.push("/admin/students")} className="text-sm text-blue-600 hover:text-blue-700 transition-colors flex items-center">
                                 View All
                                 <ChevronRight className="w-4 h-4 ml-1" />
                             </button>

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
 import API from '@/lib/axios'
-import { Module, Lesson, ModuleEdit } from '@/types'
+import { Module, ModuleEdit } from '@/types'
 import { handleApiError } from '@/lib/helpers/handleApiError'
 
 export const useCourse = (courseId?: string) => {
@@ -34,7 +34,7 @@ export const useCourse = (courseId?: string) => {
         }
     }, [])
 
-    const createModule = useCallback( async ( module: ModuleEdit) => {
+    const createModule = useCallback( async (module: ModuleEdit) => {
         setLoading(true)
         try {
             await API.post(`/api/course_module/course/${courseId}`, module)
@@ -45,9 +45,9 @@ export const useCourse = (courseId?: string) => {
         } finally {
             setLoading(false)
         }
-    }, [courseId, fetchModules])
+    },[courseId, fetchModules])
 
-    const updateModule =  useCallback( async (moduleId: string, module: ModuleEdit) => {
+    const updateModule = useCallback( async (moduleId: string, module: ModuleEdit) => {
         if (!module) return
         setLoading(true)
         try {
@@ -61,7 +61,7 @@ export const useCourse = (courseId?: string) => {
         }
     }, [fetchModules])
 
-    const deleteModule = useCallback( async (moduleId: string) => {
+    const deleteModule = useCallback(async (moduleId: string) => {
         setLoading(true)
         try {
             await API.delete(`/api/course_module/${moduleId}`)
@@ -72,31 +72,11 @@ export const useCourse = (courseId?: string) => {
         } finally {
             setLoading(false)
         }
-    }, [fetchModules])
-
-    const createLesson = async (moduleId: string, payload: Partial<Lesson>) => {
-        const res = await API.post(`/api/course/${courseId}/modules/${moduleId}/lessons`, payload)
-        toast.success('Dars yaratildi')
-        await fetchModules()
-        return res
-    }
-
-    const updateLesson = async (moduleId: string, lessonId: string, payload: Partial<Lesson>) => {
-        const res = await API.patch(`/api/course/${courseId}/modules/${moduleId}/lessons/${lessonId}`, payload)
-        toast.success('Dars yangilandi')
-        await fetchModules()
-        return res
-    }
-
-    const deleteLesson = async (moduleId: string, lessonId: string) => {
-        await API.delete(`/api/course/${courseId}/modules/${moduleId}/lessons/${lessonId}`)
-        toast.success('Dars o‘chirildi')
-        await fetchModules()
-    }
+    },[fetchModules])
 
     useEffect(() => {
         fetchModules()
     }, [fetchModules])
 
-    return { modules, loading, fetchModule, fetchModules, createModule, updateModule, deleteModule, createLesson, updateLesson, deleteLesson }
+    return { modules, loading, fetchModule, fetchModules, createModule, updateModule, deleteModule }
 }
